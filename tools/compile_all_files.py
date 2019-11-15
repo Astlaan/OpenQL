@@ -31,8 +31,7 @@ if __name__ == "__main__":
 		files.remove(__file__)
 
 	# ql.set_option('quantumsim', 'qsoverlay')
-	ql.set_option('write_report_files', 'yes')
-	ql.set_option('write_qasm_files', 'yes')
+
 	print(files)
 
 
@@ -42,7 +41,7 @@ if __name__ == "__main__":
 	measurement = False
 
 	#Some compiler options
-	log_level = 'LOG_INFO'
+	log_level = 'LOG_DEBUG'
 	scheduler = 'ALAP'
 	mapper = 'minextendrc'
 	optimize = 'yes'
@@ -54,6 +53,9 @@ if __name__ == "__main__":
 	maptiebreak = 'random'
 
 	#add other options here
+	# ql.set_option('write_report_files', 'yes')
+	ql.set_option('write_qasm_files', 'yes')
+	
 	ql.set_option('decompose_toffoli', 'no')
 
 

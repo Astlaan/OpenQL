@@ -9,13 +9,13 @@ def circuit(config_file, new_scheduler='yes', scheduler='ASAP', uniform_sched= '
 	ql.set_option('optimize', optimize)
 	ql.set_option('scheduler', scheduler)
 	ql.set_option('scheduler_uniform', uniform_sched)
-	ql.set_option('mapper', mapper)
-	ql.set_option('initialplace', initial_placement)
+	# ql.set_option('mapper', mapper)
+	# ql.set_option('initialplace', initial_placement)
 	ql.set_option('log_level', log_level)
 	ql.set_option('scheduler_post179', new_scheduler)
 	ql.set_option('scheduler_commute', sched_commute)
-	ql.set_option('mapusemoves', moves)
-	ql.set_option('maptiebreak', maptiebreak)
+	# ql.set_option('mapusemoves', moves)
+	# ql.set_option('maptiebreak', maptiebreak)
 
 	config_fn = os.path.join(curdir, config_file)
 
@@ -52,7 +52,7 @@ def circuit(config_file, new_scheduler='yes', scheduler='ASAP', uniform_sched= '
 
 	p.add_kernel(k)
 	p.compile()
-	ql.set_option('mapper', 'no')
+	# ql.set_option('mapper', 'no')
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description='OpenQL compilation of a Quantum Algorithm')
