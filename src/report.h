@@ -15,7 +15,6 @@
 #include <ir.h>
 // #include "metrics.h"
 // #include <metrics.h>
-extern double ql::metrics::quick_fidelity_circuit(const ql::circuit &circuit);
 
 
 
@@ -23,7 +22,7 @@ namespace ql
 {
 namespace metrics
 {
-	extern double quick_fidelity_circuit(const ql::circuit & circuit );
+	extern cpp_dec_float_50 quick_fidelity_circuit(const ql::circuit & circuit );
 }
 namespace report
 {
@@ -375,19 +374,19 @@ namespace report
 		ql::options::set("maxfidelity_2qbgatefid", "0.9968");
 		ql::options::set("maxfidelity_idlefid", "0.9991");
 		ql::options::set("maxfidelity_outputmode", "product");
-        ofs << prefix << "----- Metrics Score1:" << ql::utils::to_string(ql::metrics::quick_fidelity_circuit(k.c)) << "\n";
+        ofs << prefix << "----- Metrics Score1:" << ql::utils::to_string(ql::metrics::quick_fidelity_circuit(k.c), std::numeric_limits<cpp_dec_float_50>::max_digits10) << "\n";
 
 		ql::options::set("maxfidelity_1qbgatefid", "0.999");
 		ql::options::set("maxfidelity_2qbgatefid", "0.99");
 		ql::options::set("maxfidelity_idlefid", "0.999334");
 		ql::options::set("maxfidelity_outputmode", "product");
-        ofs << prefix << "----- Metrics Score2:" << ql::utils::to_string(ql::metrics::quick_fidelity_circuit(k.c)) << "\n";
+        ofs << prefix << "----- Metrics Score2:" << ql::utils::to_string(ql::metrics::quick_fidelity_circuit(k.c), std::numeric_limits<cpp_dec_float_50>::max_digits10) << "\n";
 
 		ql::options::set("maxfidelity_1qbgatefid", "0.999");
 		ql::options::set("maxfidelity_2qbgatefid", "0.99");
 		ql::options::set("maxfidelity_idlefid", "0.9867");
 		ql::options::set("maxfidelity_outputmode", "product");
-        ofs << prefix << "----- Metrics Score3:" << ql::utils::to_string(ql::metrics::quick_fidelity_circuit(k.c)) << "\n";
+        ofs << prefix << "----- Metrics Score3:" << ql::utils::to_string(ql::metrics::quick_fidelity_circuit(k.c), std::numeric_limits<cpp_dec_float_50>::max_digits10) << "\n";
 
 
 		ql::options::set("maxfidelity_1qbgatefid", maxfidelity_1qbgatefid);

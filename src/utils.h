@@ -106,6 +106,14 @@ namespace ql
             return ss.str ();
         }
 
+        template <typename T>
+        std::string to_string(T arg, int precision)
+        {
+            std::stringstream ss;
+            ss << std::setprecision(precision) << arg;
+            return ss.str ();
+        }
+
         template<class T>
         std::string to_string(std::vector<T> v, std::string vector_prefix = "",
                               std::string elem_sep = ", ")

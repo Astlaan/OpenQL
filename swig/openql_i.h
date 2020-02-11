@@ -375,9 +375,10 @@ public:
         return program->qasm();
     }
 
-	double score()
+	std::string score()
     {
-        return program->score();
+        auto value = program->score();
+		return ql::utils::to_string(value, std::numeric_limits<cpp_dec_float_50>::max_digits10);
     }
 
 	// double score()

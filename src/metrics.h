@@ -20,10 +20,11 @@
 #include "utils.h" 
 #include "options.h"
 #include "platform.h"
+#include "boost/multiprecision/cpp_dec_float.hpp"
 // #include "mapper.h"
 
 
-
+typedef boost::multiprecision::cpp_dec_float_50 cpp_dec_float_50;
 #define CYCLE_TIME 20 //TODO: gate duration is hardcoded for now
 
 #include <iostream>
@@ -97,10 +98,10 @@ public:
 	};
 
 
-	double create_output (const std::vector<double> &fids)
+	cpp_dec_float_50 create_output (const std::vector<cpp_dec_float_50> &fids)
 	{
 		DOUT("Creating output");
-		std::vector<double> result_vector;
+		std::vector<cpp_dec_float_50> result_vector;
 		result_vector = fids;
 		if (ql::options::get("maxfidelity_loglevel") == "debug")
 			PRINTER(result_vector);
@@ -108,7 +109,7 @@ public:
 		if (output_mode == "worst"){
 			IOUT("\nOutput mode: worst");
 			// return *std::min_element(fids.begin(),fids.end()); //Have to check if it is a problem that the vector contains nulls
-			double minimum = 0.0;
+			cpp_dec_float_50 minimum = 0.0;
 			for (auto x : fids)
 			{
 				if (not std::isnan(x))
@@ -124,8 +125,8 @@ public:
 		else if (output_mode == "average") 
 		{
 			
-			double sum = 0;
-			double num_active = 0;
+			cpp_dec_float_50 sum = 0;
+			cpp_dec_float_50 num_active = 0;
 			for (auto x : fids)
 			{
 				if (not std::isnan(x))
@@ -134,16 +135,16 @@ public:
 					num_active+=1;
 				}
 			}
-			DOUT("Sum fidelities :" + std::to_string(sum));
-			double average = sum / num_active;
-			DOUT("Average fidelity:" + std::to_string(average));
+			// DOUT("Sum fidelities :" + std::to_string(sum));
+			cpp_dec_float_50 average = sum / num_active;
+			// DOUT("Average fidelity:" + std::to_string(average));
 			return average;			
 		}
 
 		else if (output_mode == "product") 
 		{
 			
-			double product = 0;
+			cpp_dec_float_50 product = 0;
 			for (auto x : fids)
 			{
 				if (not std::isnan(x))
@@ -151,8 +152,8 @@ public:
 					product += x; //No log because all values are already in logarithm format
 				}
 			}
-			DOUT("Product fidelities :" + std::to_string(product));
-			// double average = sum / num_active;
+			// DOUT("Product fidelities :" + std::to_string(product));
+			// cpp_dec_float_50 average = sum / num_active;
 			// DOUT("Average fidelity:" + std::to_string(average));
 			return product;			
 		}
@@ -182,7 +183,7 @@ public:
 	} 
 	
 	
-	double bounded_fidelity(const ql::circuit& circ, std::vector<double> &fids)
+	cpp_dec_float_50 bounded_fidelity(const ql::circuit& circ, std::vector<cpp_dec_float_50> &fids)
 	{ 
 		//this function considers the primitive gates! each operand undergoing a 2-qubit operation is always considered to have the same latency
 		//same end fidelity considered for the two operands of the same 2-qubit gate
@@ -357,7 +358,7 @@ public:
 
 
 
-	double quick_fidelity_circuit(const ql::circuit & circuit )
+	cpp_dec_float_50 quick_fidelity_circuit(const ql::circuit & circuit )
 	{
 		size_t Nqubits = 17; //To be gotten from the json file/mapper when called
 		ql::metrics::Metrics estimator(Nqubits);
@@ -370,7 +371,7 @@ public:
 		}
 
 
-		std::vector<double> previous_fids(Nqubits, NAN);
+		std::vector<cpp_dec_float_50> previous_fids(Nqubits, NAN);
 
 		for (size_t i=0; i < Nqubits ; i++)
 		{
@@ -380,23 +381,28 @@ public:
 		}  
 
 		// fids.resize(Nqubits, 1.0);
-		double fidelity = estimator.bounded_fidelity(circuit, previous_fids);
+		cpp_dec_float_50 fidelity = estimator.bounded_fidelity(circuit, previous_fids);
 		fidelity =- fidelity; //Symmetric value because lower score is considered better in mapper.h
 		return fidelity;
 	}
 
-	double quick_fidelity(const std::list< ql::gate * > &gate_list )
+	cpp_dec_float_50 quick_fidelity(const std::list< ql::gate * > &gate_list )
 	{
 		// ql::Metrics estimator(17);
 		// std::vector<double> previous_fids;
 		// PRINTER(gate_list);
 		ql::circuit circuit;
 		std::copy(std::begin(gate_list), std::end(gate_list), std::back_inserter(circuit));
-		double fidelity = quick_fidelity_circuit(circuit);
+		cpp_dec_float_50 fidelity = quick_fidelity_circuit(circuit);
 		return fidelity;
 		// double fidelity = estimator.bounded_fidelity(circuit, previous_fids);
 		// fidelity =- fidelity; //Symmetric value because lower score is considered better in mapper.h
 		// return fidelity;
+	}
+
+	double quick_fidelity_dummy(const std::list< ql::gate * > &gate_list )
+	{
+		return 0.0;
 	}
 
 	// double quick_fidelity(ql::circuit circuit )
