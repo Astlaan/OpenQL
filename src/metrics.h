@@ -112,7 +112,7 @@ public:
 			cpp_dec_float_50 minimum = 0.0;
 			for (auto x : fids)
 			{
-				if (not std::isnan(x))
+				if (not boost::math::isnan(x))
 				{
 					if (x < minimum)
 						minimum = x;
@@ -129,7 +129,7 @@ public:
 			cpp_dec_float_50 num_active = 0;
 			for (auto x : fids)
 			{
-				if (not std::isnan(x))
+				if (not boost::math::isnan(x))
 				{
 					sum += x;
 					num_active+=1;
@@ -147,7 +147,7 @@ public:
 			cpp_dec_float_50 product = 0;
 			for (auto x : fids)
 			{
-				if (not std::isnan(x))
+				if (not boost::math::isnan(x))
 				{
 					product += x; //No log because all values are already in logarithm format
 				}
