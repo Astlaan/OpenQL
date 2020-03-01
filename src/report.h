@@ -365,7 +365,7 @@ namespace report
         ofs << prefix << "----- qubits used: " << qubits_used << "\n";
         ofs << prefix << "----- qubit cycles use:" << ql::utils::to_string(usedcyclecount) << "\n";
 
-		std::string maxfidelity_1qbgatefid = ql::options::get("maxfidelitym_1qbgatefid");
+		std::string maxfidelity_1qbgatefid = ql::options::get("maxfidelity_1qbgatefid");
 		std::string maxfidelity_2qbgatefid = ql::options::get("maxfidelity_2qbgatefid");
 		std::string maxfidelity_idlefid = ql::options::get("maxfidelity_idlefid");
 		std::string maxfidelity_outputmode = ql::options::get("maxfidelity_outputmode");
@@ -374,19 +374,27 @@ namespace report
 		ql::options::set("maxfidelity_2qbgatefid", "0.9968");
 		ql::options::set("maxfidelity_idlefid", "0.9991");
 		ql::options::set("maxfidelity_outputmode", "product");
-        ofs << prefix << "----- Metrics Score1:" << ql::utils::to_string(ql::metrics::quick_fidelity_circuit(k.c), std::numeric_limits<cpp_dec_float_50>::max_digits10) << "\n";
+        ofs << prefix << "----- Metrics Score1: " << ql::utils::to_string(ql::metrics::quick_fidelity_circuit(k.c), std::numeric_limits<cpp_dec_float_50>::max_digits10) << "\n";
 
 		ql::options::set("maxfidelity_1qbgatefid", "0.999");
-		ql::options::set("maxfidelity_2qbgatefid", "0.99");
+		ql::options::set("maxfidelity_2qbgatefid", "0.9968");
 		ql::options::set("maxfidelity_idlefid", "0.999334");
 		ql::options::set("maxfidelity_outputmode", "product");
-        ofs << prefix << "----- Metrics Score2:" << ql::utils::to_string(ql::metrics::quick_fidelity_circuit(k.c), std::numeric_limits<cpp_dec_float_50>::max_digits10) << "\n";
+        ofs << prefix << "----- Metrics Score2: " << ql::utils::to_string(ql::metrics::quick_fidelity_circuit(k.c), std::numeric_limits<cpp_dec_float_50>::max_digits10) << "\n";
 
 		ql::options::set("maxfidelity_1qbgatefid", "0.999");
-		ql::options::set("maxfidelity_2qbgatefid", "0.99");
+		ql::options::set("maxfidelity_2qbgatefid", "0.9968");
 		ql::options::set("maxfidelity_idlefid", "0.9867");
 		ql::options::set("maxfidelity_outputmode", "product");
-        ofs << prefix << "----- Metrics Score3:" << ql::utils::to_string(ql::metrics::quick_fidelity_circuit(k.c), std::numeric_limits<cpp_dec_float_50>::max_digits10) << "\n";
+        ofs << prefix << "----- Metrics Score3: " << ql::utils::to_string(ql::metrics::quick_fidelity_circuit(k.c), std::numeric_limits<cpp_dec_float_50>::max_digits10) << "\n";
+
+		ql::options::set("maxfidelity_1qbgatefid", "0.999");
+		ql::options::set("maxfidelity_2qbgatefid", "0.9968");
+		ql::options::set("maxfidelity_idlefid", "1.0");
+		ql::options::set("maxfidelity_outputmode", "product");
+        ofs << prefix << "----- Metrics Score4: " << ql::utils::to_string(ql::metrics::quick_fidelity_circuit(k.c), std::numeric_limits<cpp_dec_float_50>::max_digits10) << "\n";
+
+
 
 
 		ql::options::set("maxfidelity_1qbgatefid", maxfidelity_1qbgatefid);

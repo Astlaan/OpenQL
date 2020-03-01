@@ -126,6 +126,22 @@ public:
     {
         kernel = new ql::quantum_kernel(name, *(platform.platform), qubit_count, creg_count);
     }
+
+	void set_cycles(std::vector<size_t> timing)
+	{
+		for(auto i=0; i < timing.size(); i++)
+			kernel->c.at(i)->cycle = timing.at(i); 
+	}
+
+	std::vector<size_t> get_cycles()
+	{
+		std::vector<size_t> cycles;
+		cycles.reserve(kernel->c.size());
+		for(auto gate : kernel->c)
+			cycles.push_back(gate->cycle);
+		return cycles;
+	}
+
     void identity(size_t q0)
     {
         kernel->identity(q0);
@@ -276,6 +292,10 @@ public:
         kernel->conjugate(k.kernel);
     }
 
+	void from_qasm(std::string file)
+    {
+    }
+
     ~Kernel()
     {
         delete(kernel);
@@ -302,6 +322,36 @@ public:
     {
         program = new ql::quantum_program(name, *(platform.platform), qubit_count, creg_count);
     }
+
+	// std::vector< std::vector<size_t> > get_cycles()   //Not working, is returning a swig object instead of tuple of tuples.
+	// {
+		
+	// 	std::vector< std::vector<size_t> > all_kernel_cycles;
+	// 	for (auto kernel : program->kernels )
+	// 	{
+	// 		std::vector<size_t> cycles;
+	// 		for (auto gate : kernel.c)
+	// 			cycles.push_back(gate->cycle);
+	// 		all_kernel_cycles.push_back(cycles);
+	// 	}
+	// 	return all_kernel_cycles;
+	// }
+
+	std::vector<size_t> get_cycles()
+	{
+		
+		// std::vector< std::vector<size_t> > all_kernel_cycles;
+		// for (auto kernel : program->kernels )
+		// {
+			std::vector<size_t> cycles;
+			for (auto gate : program->kernels.at(0).c)
+				cycles.push_back(gate->cycle);
+			// all_kernel_cycles.push_back(cycles);
+		// }
+		// return all_kernel_cycles;
+		return cycles;
+
+	}
 
     void set_sweep_points(std::vector<float> sweep_points)
     {
@@ -363,6 +413,11 @@ public:
     void add_for(Program& p, size_t iterations)
     {
         program->add_for( *(p.program), iterations);
+    }
+
+    void schedule()
+    {
+        program->schedule();
     }
 
     void compile()

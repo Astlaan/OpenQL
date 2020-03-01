@@ -25,24 +25,30 @@ if __name__ == "__main__":
 	parser.add_argument('--idle', type=str, help='maxfidelity_idlefid')
 	parser.add_argument('--output', type=str, help='maxfidelity_outputmode')
 	parser.add_argument('--dir', type=str, help='output directory')
-	parser.add_argument('--single', action="store_true", default=False, help='output directory')
-	parser.add_argument('--debug', action="store_true", default=False, help='output directory')
+	parser.add_argument('--single', action="store_true", default=False, help='Single cpu compilation')
+	parser.add_argument('--debug', action="store_true", default=False, help='Output metrics.h debug code')
+	parser.add_argument('--indir', type=str, help='Input directory')
 
 	args = parser.parse_args()
 
-	# indir = args.indir
-	indir = './test_files/'
+	if args.indir:
+		indir = os.path.join("./test_files", args.indir)
+	else:
+		indir = "test_files/"
+	# indir = './test_files/'
 	# if not args.outdir:
-	# 	outdir = os.path.join(indir, "/output")
+		# outdir = os.path.join(indir, "/output")
 
 	curdir = os.getcwd()
 	# os.chdir(os.path.join(curdir, indir))
-	files = glob.glob(indir + '*.py')
+	files = glob.glob(indir + '/*.py')
 	files = list(map(os.path.basename, files))
 	files = list(map(lambda x: x.replace('.py', ''), files))
 	# os.chdir(curdir)
+	# print(indir + '*.py')
 	
 	sys.path.append(os.path.join(curdir, indir))
+	print("INDIR = ", indir)
 
 	if __file__ in files:
 		files.remove(__file__)
@@ -110,16 +116,18 @@ if __name__ == "__main__":
 
 	#==== Create output folder
 	all_results_dir = "test_output"
-	if args.dir:
-		all_results_dir = os.path.join(all_results_dir, args.dir)
-		if not os.path.exists(os.path.join(indir, all_results_dir)):
-			os.makedirs(os.path.join(indir, all_results_dir))
-	result_dir = generate_new_dest_dir(os.path.join(indir, all_results_dir), mapper)
-	output_dir_name = os.path.join(all_results_dir, result_dir)
-	if not os.path.exists(os.path.join(indir, output_dir_name)):
-		os.makedirs(os.path.join(indir, output_dir_name))
-	print(result_dir)
-	print(os.path.join(indir, output_dir_name))
+	curdir = os.getcwd()
+	output_dir_name = os.path.join(indir, all_results_dir)
+	# if args.dir:
+	# 	all_results_dir = os.path.join(all_results_dir, args.dir)
+	# 	if not os.path.exists(os.path.join(indir, all_results_dir)):
+	# 		os.makedirs(os.path.join(indir, all_results_dir))
+	# result_dir = generate_new_dest_dir(os.path.join(indir, all_results_dir), mapper)
+	# output_dir_name = os.path.join(all_results_dir, result_dir)
+	if not os.path.exists(output_dir_name):
+		os.makedirs(output_dir_name)
+	print("OUTDIR = ", output_dir_name)
+	# print(os.path.join(indir, output_dir_name))
 
 	#=== Serial Compilation
 	# for file in files:
@@ -150,7 +158,7 @@ if __name__ == "__main__":
 			#print(ql.get_option('maxfidelity_outputmode'))
 
 			try:
-				imported.circuit('test_mapper17.json', scheduler = scheduler, sched_commute = scheduler_commute, mapper = mapper, uniform_sched = scheduler_uniform, new_scheduler = scheduler_post179,  moves = mapusemoves, maptiebreak = maptiebreak, measurement = measurement, optimize = optimize, initial_placement = initialplace, output_dir_name = output_dir_name, log_level = log_level)
+				imported.circuit("/home/dmalvalada/bulk/openql_tools/test_files/test_mapper17.json", scheduler = scheduler, sched_commute = scheduler_commute, mapper = mapper, uniform_sched = scheduler_uniform, new_scheduler = scheduler_post179,  moves = mapusemoves, maptiebreak = maptiebreak, measurement = measurement, optimize = optimize, initial_placement = initialplace, output_dir_name = output_dir_name, log_level = log_level)
 			except Exception as e:
 				print(str(e))
 		# def _test():
@@ -255,8 +263,8 @@ if __name__ == "__main__":
 	]
 	print("Wrote files to:", output_dir_name)
 	print("Writing parameters to:", 'test_files', output_dir_name,'parameters.txt')
-	with open(os.path.join('test_files', output_dir_name,'parameters.txt'), 'w') as fopen:
+	with open(os.path.join(output_dir_name,'parameters.txt'), 'w') as fopen:
 		fopen.writelines(parameters)
-	with open(os.path.join('test_files', 'test_output','parameters_all.txt'), 'a') as fopen:
-		fopen.writelines(["\n\n\n", "=== " + result_dir + " ===\n"])
-		fopen.writelines(parameters)
+	# with open(os.path.join('test_files', 'test_output','parameters_all.txt'), 'a') as fopen:
+	# 	fopen.writelines(["\n\n\n", "=== " + indir + " ===\n"])
+	# 	fopen.writelines(parameters)

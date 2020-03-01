@@ -176,7 +176,7 @@ from joblib import Parallel, delayed, cpu_count
 		
 # 	return k
 #%%
-def random_circuit_mirrored(qubits, size, two_qubit_fraction, seed = None):
+def random_circuit(qubits, size, two_qubit_fraction, initialization = 'h', mirrored = True, seed = None):
 	"""
 	Args:
 		qubits: Number of circuit qubits.
@@ -208,30 +208,49 @@ def random_circuit_mirrored(qubits, size, two_qubit_fraction, seed = None):
 
 	gates_1qb = ['x','x45','x90','xm45','xm90','y','y45','y90','ym45','ym90']
 	gates_2qb = ['cz']
+	# all_gates = gates_1qb + gates_2qb
 	qubit_list = list(range(qubits))
 	# probs = {}
 	gate_list = []
 
+	if initialization == 'h':
+		for qubit in qubit_list:
+			gate_list.append(('x', (qubit,)))
+			gate_list.append(('ym90', (qubit,)))
 
-	for i in range(round(size/2)):
+	elif initialization == 'random':
+		for qubit in qubit_list:
+			gate_list.append((random.choice(gates_1qb), (qubit,)))
+
+	elif initialization == 'x':
+		for qubit in qubit_list:
+			gate_list.append(('x', (qubit,)))
+
+	if mirrored:
+		ngates = round(size/2)
+	else:
+		ngates = size
+
+	for i in range(ngates):
 		dice = random.random()
 		if dice < two_qubit_fraction:
 			gate = 'cz'
-			operands = random.sample(qubit_list, 2)
+			operands = tuple(random.sample(qubit_list, 2))
 			gate_list.append((gate, operands))
 			# k.gate(gate, [operands[0], operands[1]])
 		else:
 			gate = random.choice(gates_1qb)
-			operand = [random.choice(qubit_list)]
+			operand = (random.choice(qubit_list),)
 			# k.gate(gate, [operand])
 			gate_list.append((gate, operand))
 
 	#Now we mirror the circuit!!! Append the conjugate gates at the end
 	inverse_dict = {'x':'x','x45':'xm45','x90':'xm90','xm45':'x45','xm90':'x90','y':'y','y45':'ym45','y90':'ym90','ym45':'y45','ym90':'y90', 'cz':'cz'}
-	for gate in reversed(gate_list):
-		gate_list.append((inverse_dict[gate[0]], gate[1]))
+	if mirrored:
+		for gate in reversed(gate_list):
+			gate_list.append((inverse_dict[gate[0]], gate[1]))
 
-	return gate_list
+	return tuple(gate_list)
 
 
 
@@ -255,7 +274,7 @@ import argparse
 
 def circuit(config_file, new_scheduler='yes', scheduler='ASAP', uniform_sched= 'no', sched_commute = 'yes', mapper='base', moves='no', maptiebreak='random', initial_placement='no', output_dir_name='test_output', optimize='no', measurement=True, log_level='LOG_WARNING'):
     curdir = os.path.dirname(__file__)
-    output_dir = os.path.join(curdir, output_dir_name)
+    output_dir = output_dir_name
     ql.set_option('output_dir', output_dir)
     ql.set_option('optimize', optimize)
     ql.set_option('scheduler', scheduler)
@@ -268,10 +287,8 @@ def circuit(config_file, new_scheduler='yes', scheduler='ASAP', uniform_sched= '
     ql.set_option('mapusemoves', moves)
     ql.set_option('maptiebreak', maptiebreak)
 
-    config_fn = os.path.join(curdir, config_file)
-
-    # platform  = ql.Platform('platform_none', config_fn)
-    platform  = ql.Platform('starmon', config_fn)
+    # platform  = ql.Platform('platform_none', config_file)
+    platform  = ql.Platform('starmon', config_file)
     num_circuits = 1\n"""
     
 	middle = "    num_qubits = " + str(qubits)+ "\n"
@@ -313,48 +330,143 @@ if __name__ == '__main__':
 
 	return beginning + middle + bulk + end
 
+#%%
+file_counter = {} # keys: (qubit_number, size, qubit_fraction), value = count
+def start_file_counter(input):
+	global file_counter
 
+	files = [name for name in os.listdir(input) if os.path.isfile(os.path.join(input,name)) and (".py" in name)]
 
+	name = ""
+	for file in files:
+		extension_index = file.rindex(".")
+		file = file[:extension_index]
 
-# %%
-# import time
-# start = time.time()
-# k = random_circuit(4,10, 0.5)
-# finish = time.time()
+		start = [i for i in range(len(file)) if file.startswith('=', i)]
+		finish = [i for i in range(len(file)) if file.startswith('_', i)]
 
-# print(finish-start)
-# platform  = ql.Platform('test_platform', "test_files/test_mapper17.json")
-# p = ql.Program('4gt4_v0_73', platform, 10)
-# p.add_kernel(k)
-# print(p.qasm())
-# %%
-def save_random_circ_list(circ_list, qubits, size, two_qubit_fraction):
-	input = "test_files/random_circuits"
-	file_pattern = "q="+str(qubits)+"_s="+str(size)+"_2qbf="+str(round(two_qubit_fraction,2)).replace('.', '')
-	files = [name for name in os.listdir(input) if os.path.isfile(os.path.join(input,name)) and (file_pattern in name)]
-	if files:
-		new_number = max([int(file.split("_")[-1].split('.')[0]) for file in files])+1
-	else:
-		new_number = 1
+		q = file[start[0]+1:finish[0]]
+		s = file[start[1]+1:finish[1]]
+		twoqbf = file[start[2]+1:finish[2]]
+		count = int(file[finish[-1]+1:])
 
-	for circ in circ_list:
-		circ_name = file_pattern+"_"+str(new_number) 
-		with open(os.path.join(input, circ_name+'.py'), 'w') as fopen:
-			fopen.writelines(get_openql_script(circ_name, qubits, circ))
-		new_number+=1
+		if file_counter.get((q,s,twoqbf), 0) < count:
+			file_counter[(q,s,twoqbf)] = count
 
 #%%
+def save_random_circ_list(circ_list, qubits, size, two_qubit_fraction):
+
+	global file_counter
+	global input
+
+	two_qubit_fraction = str(round(two_qubit_fraction,2)).replace('.', '')
+	qubits = str(qubits)
+	size = str(size)
+
+
+	file_pattern = "q="+qubits+"_s="+size+"_2qbf="+two_qubit_fraction
+
+	number = file_counter.get((qubits, size, two_qubit_fraction), 0)
+
+	for circ in circ_list:
+		number+=1
+		circ_name = file_pattern+"_"+str(number) 
+		with open(os.path.join(input, circ_name+'.py'), 'w') as fopen:
+			fopen.writelines(get_openql_script(circ_name, qubits, circ))
+		
+	file_counter[(qubits, size, two_qubit_fraction)] = number
+
+############################################################################
+#INPUT FOLDER
+
+#############################################################################
+
+#%%####################################################
+
 import numpy as np
 from tqdm import tqdm
-samples = 5
-qubits = 10
-for size in tqdm(range(100, 4000, 100)):
-	for two_qubit_fraction in np.arange(0,1.2,0.2):
-		circ_list = [random_circuit_mirrored(qubits, size, two_qubit_fraction) for sample in range(samples)]
-		#Don't use parallel with random
-		save_random_circ_list(circ_list, qubits, size, two_qubit_fraction)
+qubits = 5
+initialization = "random"
+min_max_step_samples = []
+min_max_step_samples += [(2, 20, 2, 100)]  
+min_max_step_samples += [(20, 100, 5, 100)]
+min_max_step_samples += [(100, 1000, 20, 20)]
+min_max_step_samples += [(1000, 2000, 50, 50)]
+input = "test_files/random_circuits/random_initialization_mirrored_big_3"
+if not os.path.exists(input):
+	os.makedirs(input)
+start_file_counter(input)
 
-# %%
+for configuration in min_max_step_samples:
+	samples = configuration[-1]
+	for size in tqdm(range(*configuration[0:3])):
+		for two_qubit_fraction in np.arange(0,1.2,0.2):
+			circ_list = set([random_circuit(qubits, size, two_qubit_fraction, initialization = 'random', mirrored = True) for sample in range(samples)])
+			#Don't use parallel with random
+			save_random_circ_list(circ_list, qubits, size, two_qubit_fraction)
 
 
-# %%
+#%%%#############################################################
+
+# import numpy as np
+# from tqdm import tqdm
+# samples = 5
+# qubits = 10 
+# for size in tqdm(range(100, 2000, 100)):
+# 	for two_qubit_fraction in np.arange(0,1.2,0.2):
+# 		circ_list = [random_circuit(qubits, size, two_qubit_fraction, initialization = 'random', mirrored = False) for sample in range(samples)]
+# 		#Don't use parallel with random
+# 		save_random_circ_list(circ_list, qubits, size, two_qubit_fraction)
+# #%%
+# import numpy as np
+# from tqdm import tqdm
+# samples = 20
+# qubits = 10
+# for size in tqdm(range(20, 110, 10)):
+# 	for two_qubit_fraction in np.arange(0,1.2,0.2):
+# 		circ_list = [random_circuit(qubits, size, two_qubit_fraction, initialization = 'random', mirrored = False) for sample in range(samples)]
+# 		#Don't use parallel with random
+# 		save_random_circ_list(circ_list, qubits, size, two_qubit_fraction)
+
+# # %%
+# import numpy as np
+# from tqdm import tqdm
+# samples = 20
+# qubits = 10
+# for size in tqdm(range(2, 20, 2)):
+# 	for two_qubit_fraction in np.arange(0,1.2,0.2):
+# 		circ_list = [random_circuit(qubits, size, two_qubit_fraction, initialization = 'random', mirrored = False) for sample in range(samples)]
+# 		#Don't use parallel with random
+# 		save_random_circ_list(circ_list, qubits, size, two_qubit_fraction)
+
+# #%%
+# import numpy as np
+# from tqdm import tqdm
+# samples = 5
+# qubits = 5 
+# for size in tqdm(range(100, 2000, 100)):
+# 	for two_qubit_fraction in np.arange(0,1.2,0.2):
+# 		circ_list = [random_circuit(qubits, size, two_qubit_fraction, initialization = 'random', mirrored = False) for sample in range(samples)]
+# 		#Don't use parallel with random
+# 		save_random_circ_list(circ_list, qubits, size, two_qubit_fraction)
+# #%%
+# import numpy as np
+# from tqdm import tqdm
+# samples = 20
+# qubits = 5
+# for size in tqdm(range(20, 110, 10)):
+# 	for two_qubit_fraction in np.arange(0,1.2,0.2):
+# 		circ_list = [random_circuit(qubits, size, two_qubit_fraction, initialization = 'random', mirrored = False) for sample in range(samples)]
+# 		#Don't use parallel with random
+# 		save_random_circ_list(circ_list, qubits, size, two_qubit_fraction)
+
+# # %%
+# import numpy as np
+# from tqdm import tqdm
+# samples = 20
+# qubits = 5
+# for size in tqdm(range(2, 20, 2)):
+# 	for two_qubit_fraction in np.arange(0,1.2,0.2):
+# 		circ_list = [random_circuit(qubits, size, two_qubit_fraction, initialization = 'random', mirrored = False) for sample in range(samples)]
+# 		#Don't use parallel with random
+# 		save_random_circ_list(circ_list, qubits, size, two_qubit_fraction)
