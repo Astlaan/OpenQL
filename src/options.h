@@ -50,6 +50,7 @@ namespace ql
           opt_name2opt_val["maxfidelity_1qbgatefid"] = "0.999";
           opt_name2opt_val["maxfidelity_2qbgatefid"] = "0.9968";
           opt_name2opt_val["maxfidelity_idlefid"] = "0.9991";
+          opt_name2opt_val["maxfidelity_2qbgexp"] = "full";
           opt_name2opt_val["maxfidelity_loglevel"] = "normal";
           opt_name2opt_val["mapassumezeroinitstate"] = "no";
           opt_name2opt_val["mapinitone2one"] = "yes";
@@ -93,6 +94,7 @@ namespace ql
           app->add_set_ignore_case("--maxfidelity_1qbgatefid", opt_name2opt_val["maxfidelity_1qbgatefid"], {"0.999", "0.9996"}, "Mapper maxfidelity heuristic average 1-qubit gate fidelity", true);
           app->add_set_ignore_case("--maxfidelity_2qbgatefid", opt_name2opt_val["maxfidelity_2qbgatefid"], {"0.9968", "0.99", "0.96", "0.93"}, "Mapper maxfidelity heuristic average 2-qubit gate fidelity", true);
           app->add_set_ignore_case("--maxfidelity_idlefid", opt_name2opt_val["maxfidelity_idlefid"], {"0.9991", "0.9867", "0.999334", "0.993356", "0.999999999999999", "1.0"}, "Mapper maxfidelity heuristic average idle-qubit gate fidelity", true);
+          app->add_set_ignore_case("--maxfidelity_2qbgexp", opt_name2opt_val["maxfidelity_2qbgexp"], {"full", "ind", "target", "target2"}, "Mapper maxfidelity heuristic average 2-qubit gate fidelity", true);
           app->add_set_ignore_case("--maxfidelity_loglevel", opt_name2opt_val["maxfidelity_loglevel"], {"normal", "debug"}, "Mapper maxfidelity log level", true);
           app->add_set_ignore_case("--mapinitone2one", opt_name2opt_val["mapinitone2one"], {"no", "yes"}, "Initialize mapping of virtual qubits one to one to real qubits", true);
           app->add_set_ignore_case("--mapprepinitsstate", opt_name2opt_val["mapprepinitsstate"], {"no", "yes"}, "Prep gate leaves qubit in zero state", true);
@@ -109,7 +111,7 @@ namespace ql
           app->add_set_ignore_case("--mapusemoves", opt_name2opt_val["mapusemoves"], {"no", "yes", "0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20"}, "Use unused qubit to move thru", true);
           app->add_set_ignore_case("--mapreverseswap", opt_name2opt_val["mapreverseswap"], {"no", "yes"}, "Reverse swap operands when better", true);
 
-          app->add_set_ignore_case("--write_qasm_files", opt_name2opt_val["write_qasm_files"], {"yes", "no"}, "write (un-)scheduled (with and without resource-constraint) qasm files", true);
+          app->add_set_ignore_case("--write_qasm_files", opt_name2opt_val["write_qasm_files"], {"yes", "no", "final_only"}, "write (un-)scheduled (with and without resource-constraint) qasm files", true);
           app->add_set_ignore_case("--write_report_files", opt_name2opt_val["write_report_files"], {"yes", "no"}, "write report files on circuit characteristics and pass results", true);
       }
 

@@ -295,8 +295,38 @@ public:
 					PRINTER(fids);
 				}
 
+				if (ql::options::get("maxfidelity_2qbgexpr") == "full")
+				{
 				fids[qubit_c] +=  fids[qubit_t] + log(gatefid_2); //Update fidelity after gate
 				fids[qubit_t] = fids[qubit_c];  					//Update fidelity after gate
+				}
+				
+				else if (ql::options::get("maxfidelity_2qbgexpr") == "ind")
+				{
+				fids[qubit_c] += log(gatefid_2); //Update fidelity after gate
+				fids[qubit_t] += log(gatefid_2);  					//Update fidelity after gate
+				}
+
+				else if (ql::options::get("maxfidelity_2qbgexpr") == "target")
+				{
+				fids[qubit_t] += fids[qubit_c] + log(gatefid_2);  					//Update fidelity after gate
+				// fids[qubit_c] += log(gatefid_2); //Update fidelity after gate
+				}
+
+				else if (ql::options::get("maxfidelity_2qbgexpr") == "target2")
+				{
+				fids[qubit_t] += fids[qubit_c] + log(gatefid_2);  					//Update fidelity after gate
+				fids[qubit_c] += log(gatefid_2); //Update fidelity after gate
+				}
+
+				// else if (ql::options::get("maxfidelity_2qbexpr") == "target")
+				// {
+				// // fids[qubit_c] += log(gatefid_2); //Update fidelity after gate
+				// fids[qubit_t] += log(gatefid_2);  					//Update fidelity after gate
+				// }
+
+
+
 
 				//TODO - Convert the code into a for loop with range 2, to get the compiler's for optimization (and possible paralellization?)
 			}
