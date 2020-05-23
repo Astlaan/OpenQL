@@ -395,12 +395,33 @@ namespace report
         ofs << prefix << "----- Metrics Score4: " << ql::utils::to_string(ql::metrics::quick_fidelity_circuit(k.c), std::numeric_limits<cpp_dec_float_50>::max_digits10) << "\n";
 
 
+		ql::options::set("maxfidelity_1qbgatefid", "0.999");
+		ql::options::set("maxfidelity_2qbgatefid", "0.9968");
+		ql::options::set("maxfidelity_idlefid", "0.9991");
+		ql::options::set("maxfidelity_outputmode", "product");
+		ql::options::set("maxfidelity_2qbgexp", "ind");
+        ofs << prefix << "----- Metrics Score5: " << ql::utils::to_string(ql::metrics::quick_fidelity_circuit(k.c), std::numeric_limits<cpp_dec_float_50>::max_digits10) << "\n";
 
+
+		ql::options::set("maxfidelity_1qbgatefid", "0.999");
+		ql::options::set("maxfidelity_2qbgatefid", "0.9968");
+		ql::options::set("maxfidelity_idlefid", "0.9991");
+		ql::options::set("maxfidelity_outputmode", "product");
+		ql::options::set("maxfidelity_2qbgexp", "target");
+        ofs << prefix << "----- Metrics Score6: " << ql::utils::to_string(ql::metrics::quick_fidelity_circuit(k.c), std::numeric_limits<cpp_dec_float_50>::max_digits10) << "\n";
+
+		ql::options::set("maxfidelity_1qbgatefid", "0.999");
+		ql::options::set("maxfidelity_2qbgatefid", "0.9968");
+		ql::options::set("maxfidelity_idlefid", "0.9991");
+		ql::options::set("maxfidelity_outputmode", "product");
+		ql::options::set("maxfidelity_2qbgexp", "target2");
+        ofs << prefix << "----- Metrics Score7: " << ql::utils::to_string(ql::metrics::quick_fidelity_circuit(k.c), std::numeric_limits<cpp_dec_float_50>::max_digits10) << "\n";
 
 		ql::options::set("maxfidelity_1qbgatefid", maxfidelity_1qbgatefid);
 		ql::options::set("maxfidelity_2qbgatefid", maxfidelity_2qbgatefid);
 		ql::options::set("maxfidelity_idlefid", maxfidelity_idlefid);
 		ql::options::set("maxfidelity_outputmode", maxfidelity_outputmode);
+		ql::options::set("maxfidelity_2qbgexp", "full");
         // DOUT("... reporting report_kernel_statistics [done]");
     }
 
